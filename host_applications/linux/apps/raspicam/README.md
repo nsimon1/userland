@@ -1,3 +1,6 @@
+# THIS RAWCAM BRANCH IS BEING DEPRECATED.
+# raspiraw has moved to https://github.com/6by9/raspiraw
+
 # RaspiCam Documentation
 
 This document describes the use of the three Raspberry Pi camera applications as of October 11th 2013.
