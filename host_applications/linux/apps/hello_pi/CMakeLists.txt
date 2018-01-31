@@ -9,6 +9,7 @@ set(ILCLIENT_SRCS libs/ilclient/ilclient.c libs/ilclient/ilcore.c)
 add_library(ilclient ${ILCLIENT_SRCS})
 
 set(HELLO_PI_LIBS ilclient openmaxil bcm_host vcos vchiq_arm)
+set(HELLO_PI_MMAL_LIBS bcm_host vcos vchiq_arm mmal mmal_core mmal_util mmal_vc_client)
 
 add_subdirectory(hello_world)
 add_subdirectory(hello_video)
@@ -21,6 +22,8 @@ add_subdirectory(hello_encode)
 add_subdirectory(hello_jpeg)
 add_subdirectory(hello_videocube)
 add_subdirectory(hello_teapot)
+add_subdirectory(hello_mmal_jpeg)
+add_subdirectory(hello_mmal_video)
 
 if(BUILD_FONT)
 set(VGFONT_SRCS libs/vgfont/font.c libs/vgfont/vgft.c libs/vgfont/graphics.c)
