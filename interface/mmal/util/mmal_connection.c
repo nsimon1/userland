@@ -168,7 +168,7 @@ MMAL_STATUS_T mmal_connection_create(MMAL_CONNECTION_T **cx,
    if (!cx)
       return MMAL_EINVAL;
 
-   private = vcos_malloc(size, "mmal connection");
+   private = vcos_calloc(1, size, "mmal connection");
    if (!private)
       return MMAL_ENOMEM;
    memset(private, 0, size);
@@ -425,7 +425,9 @@ MMAL_STATUS_T mmal_connection_disable(MMAL_CONNECTION_T *connection)
       mmal_buffer_header_release(buffer);
       buffer = mmal_queue_get(connection->queue);
    }
-   vcos_assert(mmal_queue_length(connection->pool->queue) == connection->pool->headers_num);
+   if (mmal_queue_length(connection->pool->queue) != connection->pool->headers_num)
+      LOG_ERROR("mmal_queue_length(connection->pool->queue) %u != connection->pool->headers_num %u", mmal_queue_length(connection->pool->queue), connection->pool->headers_num);
+   //vcos_assert(mmal_queue_length(connection->pool->queue) == connection->pool->headers_num);
 
  done:
    connection->time_disable = vcos_getmicrosecs() - connection->time_disable;

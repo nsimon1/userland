@@ -152,7 +152,7 @@ static MMAL_STATUS_T mmal_component_create_core(const char *name,
 
    /* Build the list of all the ports */
    (*component)->port_num = (*component)->input_num + (*component)->output_num + (*component)->clock_num + 1;
-   (*component)->port = vcos_malloc((*component)->port_num * sizeof(MMAL_PORT_T *), "mmal ports");
+   (*component)->port = vcos_calloc(1, (*component)->port_num * sizeof(MMAL_PORT_T *), "mmal ports");
    if (!(*component)->port)
    {
       status = MMAL_ENOMEM;

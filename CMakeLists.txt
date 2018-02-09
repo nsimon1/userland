@@ -18,6 +18,12 @@ endif()
 set(vmcs_root ${PROJECT_SOURCE_DIR})
 get_filename_component(VIDEOCORE_ROOT . ABSOLUTE)
 
+find_program(VALGRIND "valgrind")
+if(VALGRIND)
+   add_definitions(-DHAVE_VALGRIND)
+   include(/usr/include/valgrind)
+endif()
+
 set(VCOS_PTHREADS_BUILD_SHARED TRUE)
 
 include(makefiles/cmake/global_settings.cmake)

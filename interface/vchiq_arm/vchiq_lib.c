@@ -37,6 +37,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "interface/vchi/common/endian.h"
 #include "interface/vcos/vcos.h"
 
+#ifdef HAVE_VALGRIND
+   #include <valgrind.h>
+   #include <memcheck.h>
+   #define VG(x) x
+#else
+   #define VG(x)
+#endif
+
 #define IS_POWER_2(x) ((x & (x - 1)) == 0)
 #define VCHIQ_MAX_INSTANCE_SERVICES 32
 #define MSGBUF_SIZE (VCHIQ_MAX_MSG_SIZE + sizeof(VCHIQ_HEADER_T))
@@ -1450,6 +1458,9 @@ vchiq_lib_init(const int dev_vchiq_fd)
          args.config_size = sizeof(config);
          args.pconfig = &config;
          RETRY(ret, ioctl(instance->fd, VCHIQ_IOC_GET_CONFIG, &args));
+
+         VG(VALGRIND_MAKE_MEM_DEFINED(&config, sizeof(config)));
+
          if ((ret == 0) && (config.version >= VCHIQ_VERSION_MIN) && (config.version_min <= VCHIQ_VERSION))
          {
             if (config.version >= VCHIQ_VERSION_LIB_VERSION)
@@ -1499,7 +1510,7 @@ completion_thread(void *arg)
 {
    VCHIQ_INSTANCE_T instance = (VCHIQ_INSTANCE_T)arg;
    VCHIQ_AWAIT_COMPLETION_T args;
-   VCHIQ_COMPLETION_DATA_T completions[8];
+   VCHIQ_COMPLETION_DATA_T completions[8] = {};
    void *msgbufs[8];
 
    static const VCHI_CALLBACK_REASON_T vchiq_reason_to_vchi[] =
@@ -1546,6 +1557,10 @@ completion_thread(void *arg)
       {
          VCHIQ_COMPLETION_DATA_T *completion = &completions[i];
          VCHIQ_SERVICE_T *service = (VCHIQ_SERVICE_T *)completion->service_userdata;
+
+         VG(VALGRIND_MAKE_MEM_DEFINED(completion, sizeof(*service)));
+         VG(VALGRIND_MAKE_MEM_DEFINED(service, sizeof(*service)));
+
          if (service->base.callback)
          {
             vcos_log_trace( "callback(%x, %x, %x(%x,%x), %x)",
@@ -1750,7 +1765,7 @@ alloc_msgbuf(void)
       free_msgbufs = *(void **)msgbuf;
    vcos_mutex_unlock(&vchiq_lib_mutex);
    if (!msgbuf)
-      msgbuf = vcos_malloc(MSGBUF_SIZE, "alloc_msgbuf");
+      msgbuf = vcos_calloc(1, MSGBUF_SIZE, "alloc_msgbuf");
    return msgbuf;
 }
 

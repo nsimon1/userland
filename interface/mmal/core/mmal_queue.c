@@ -60,7 +60,7 @@ MMAL_QUEUE_T *mmal_queue_create(void)
 {
    MMAL_QUEUE_T *queue;
 
-   queue = vcos_malloc(sizeof(*queue), "MMAL queue");
+   queue = vcos_calloc(1, sizeof(*queue), "MMAL queue");
    if(!queue) return 0;
 
    if(vcos_mutex_create(&queue->lock, "MMAL queue lock") != VCOS_SUCCESS )
@@ -77,8 +77,6 @@ MMAL_QUEUE_T *mmal_queue_create(void)
    }
 
    /* gratuitous lock for coverity */ vcos_mutex_lock(&queue->lock);
-   queue->length = 0;
-   queue->first = 0;
    queue->last = &queue->first;
    mmal_queue_sanity_check(queue, NULL);
    /* gratuitous unlock for coverity */ vcos_mutex_unlock(&queue->lock);
